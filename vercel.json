@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm --prefix client install",
+  "buildCommand": "mkdir -p client/public && cp client/src/data/rentals.json client/public/rentals.json && npm --prefix client run build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    { "source": "/api/rentals", "destination": "/rentals.json" }
+  ],
+  "headers": [
+    {
+      "source": "/rentals.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ]
+}
