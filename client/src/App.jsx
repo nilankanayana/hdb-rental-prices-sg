@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import Controls from './components/Controls.jsx';
 import ThemeToggle from './components/ThemeToggle.jsx';
 import FlatTypeSelector from './components/FlatTypeSelector.jsx';
@@ -7,6 +8,7 @@ import MapView from './components/MapView.jsx';
 import SearchBox from './components/SearchBox.jsx';
 import TownPanel from './components/TownPanel.jsx';
 import AddressPanel from './components/AddressPanel.jsx';
+import ProjectsPage from './pages/ProjectsPage.jsx';
 import { useResource } from './hooks/useResource.js';
 import { useTheme } from './hooks/useTheme.js';
 import { ALL_FLAT_TYPE, townMedians, computeBands, buildAddressIndex } from './lib/rentals.js';
@@ -15,7 +17,9 @@ const NEVER_MS = 24 * 60 * 60 * 1000; // static data — never auto-poll
 
 export default function App() {
   const [theme, toggleTheme] = useTheme();
-  const { data, error, loading, refresh } = useResource('/api/rentals', NEVER_MS);
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
+  const { data, error, loading, refresh } = useResource(`${import.meta.env.BASE_URL}api/rentals`, NEVER_MS);
 
   const [flatType, setFlatType] = useState(ALL_FLAT_TYPE);
   const [monthIdx, setMonthIdx] = useState(null);
@@ -59,20 +63,27 @@ export default function App() {
             <span className="brand-subtitle">Median rent by town · data.gov.sg</span>
           </div>
         </div>
+        <nav className="app-nav">
+          <NavLink to="/" end className={({ isActive }) => `app-nav-link${isActive ? ' app-nav-link--active' : ''}`}>Dashboard</NavLink>
+          <NavLink to="/projects" className={({ isActive }) => `app-nav-link${isActive ? ' app-nav-link--active' : ''}`}>Projects</NavLink>
+        </nav>
         <div className="header-actions">
-          <Controls
-            onRefresh={refresh}
-            loading={loading}
-            error={error}
-            hasData={!!data}
-            monthRange={data?.monthRange}
-            count={data?.totalRecords}
-          />
+          {isDashboard && (
+            <Controls
+              onRefresh={refresh}
+              loading={loading}
+              error={error}
+              hasData={!!data}
+              monthRange={data?.monthRange}
+              count={data?.totalRecords}
+            />
+          )}
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </header>
-
-      <main className="app-main">
+      <Routes>
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/" element={<main className="app-main">
         <section className="map-card">
           {data && monthIdx != null && (
             <div className="map-toolbar">
@@ -144,7 +155,8 @@ export default function App() {
             )
           )}
         </section>
-      </main>
+        </main>} />
+      </Routes>
 
       <footer className="app-footer">
         <span>

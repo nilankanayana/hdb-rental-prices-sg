@@ -3,8 +3,14 @@
   "installCommand": "npm --prefix client install",
   "buildCommand": "mkdir -p client/public && cp client/src/data/rentals.json client/public/rentals.json && npm --prefix client run build",
   "outputDirectory": "client/dist",
+  "build": {
+    "env": {
+      "VITE_BASE_PATH": "/projects/hdb-rental-prices-sg"
+    }
+  },
   "rewrites": [
-    { "source": "/api/rentals", "destination": "/rentals.json" }
+    { "source": "/api/rentals", "destination": "/rentals.json" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
