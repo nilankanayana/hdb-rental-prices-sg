@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     base: basePath ? `${basePath}/` : '/',
+    optimizeDeps: {
+      exclude: ['maplibre-gl'],
+    },
     server: {
       host: clientHost,
       port: clientPort,
