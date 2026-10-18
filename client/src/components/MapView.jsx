@@ -1,11 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@maplibre/maplibre-gl-leaflet';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import MapLegend from './MapLegend.jsx';
 import { bandOf, addressRent } from '../lib/rentals.js';
 import { formatRentCompact } from '../lib/format.js';
+
+// MapLibre finds its web worker by resolving a relative path off its own
+// import.meta.url, which only works when it ships as a standalone file next
+// to itself. Vite inlines it into our single bundle instead, so that lookup
+// 404s and tiles silently never render (only the static background paints).
+// Importing the worker as an explicit asset URL fixes the path for both dev
+// and the production (subpath) build.
+setWorkerUrl(maplibreWorkerUrl);
 
 const DEFAULT_CENTER = [1.3521, 103.8198];
 const DEFAULT_ZOOM = 11;
